@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>Gesundheits Tracker</title>
+
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- iOS PWA Einstellungen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+</head>
+<body>
+
+<header>
+    <h1>🧘‍♂️ Tagesübersicht</h1>
+    <p id="today"></p>
+</header>
+
+<main>
+
+    <section>
+        <h2>💊 Medikamente</h2>
+        <ul id="medication-list"></ul>
+        <button id="add-medication">+ Medikament hinzufügen</button>
+    </section>
+
+    <section>
+        <h2>🤸‍♂️ Dehnübungen</h2>
+        <ul id="exercise-list"></ul>
+        <button id="add-exercise">+ Übung hinzufügen</button>
+    </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
