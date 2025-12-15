@@ -57,20 +57,51 @@ function renderMedications() {
   data.medications.forEach(med => {
     const li = document.createElement("li");
 
-    const label = document.createElement("label");
+    const left = document.createElement("div");
+
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
-    checkbox.checked = med.taken;
+    checkbox.checked = !!data.daily.medicationsTaken[med.id];
 
     checkbox.addEventListener("change", () => {
-      med.taken = checkbox.checked;
+      data.daily.medicationsTaken[med.id] = checkbox.checked;
       saveData(data);
     });
 
-    label.appendChild(checkbox);
-    label.append(" " + med.name);
+    left.appendChild(checkbox);
+    left.append(" " + med.name);
 
-    li.appendChild(label);
+    const actions = document.createElement("div");
+
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "✏️";
+    editBtn.className = "secondary";
+    editBtn.style.width = "auto";
+
+    editBtn.onclick = () => {
+      const newName = prompt("Name bearbeiten:", med.name);
+      if (newName) {
+        med.name = newName;
+        saveData(data);
+        renderMedications();
+      }
+    };
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "🗑️";
+    deleteBtn.style.width = "auto";
+
+    deleteBtn.onclick = () => {
+      if (confirm("Medikament löschen?")) {
+        data.medications = data.medications.filter(m => m.id !== med.id);
+        delete data.daily.medicationsTaken[med.id];
+        saveData(data);
+        renderMedications();
+      }
+    };
+
+    actions.append(editBtn, deleteBtn);
+    li.append(left, actions);
     medicationList.appendChild(li);
   });
 }
@@ -92,21 +123,18 @@ document.getElementById("add-medication").addEventListener("click", () => {
 /* ---------- Übungen ---------- */
 const exerciseList = document.getElementById("exercise-list");
 
-function startTimer(duration, display) {
+function startTimer(duration, onFinish) {
   let time = duration;
-  display.textContent = time + "s";
 
   const interval = setInterval(() => {
-    time--;
-    display.textContent = time + "s";
-
-    if (time <= 0) {
+    if (--time <= 0) {
       clearInterval(interval);
-      display.textContent = "✔️";
-      alert("Übung abgeschlossen 🎉");
+      alert("Fertig 🎉");
+      onFinish();
     }
   }, 1000);
 }
+
 
 function renderExercises() {
   exerciseList.innerHTML = "";
@@ -115,24 +143,60 @@ function renderExercises() {
     const li = document.createElement("li");
 
     const name = document.createElement("span");
-    name.textContent = ex.name + " (" + ex.duration + "s)";
+    name.textContent = `${ex.name} (${ex.duration}s)`;
 
-    const timer = document.createElement("span");
-    timer.className = "timer";
+    const counter = document.createElement("span");
+    counter.className = "timer";
+    counter.textContent =
+        (data.daily.exercisesDone[ex.id] || 0) + "×";
 
-    const button = document.createElement("button");
-    button.textContent = "Start";
-    button.className = "secondary";
-    button.style.width = "auto";
+    const startBtn = document.createElement("button");
+    startBtn.textContent = "Start";
+    startBtn.className = "secondary";
+    startBtn.style.width = "auto";
 
-    button.addEventListener("click", () => {
-      startTimer(ex.duration, timer);
-    });
+    startBtn.onclick = () => {
+      startTimer(ex.duration, () => {
+        data.daily.exercisesDone[ex.id] =
+            (data.daily.exercisesDone[ex.id] || 0) + 1;
+        saveData(data);
+        renderExercises();
+      });
+    };
 
-    li.appendChild(name);
-    li.appendChild(timer);
-    li.appendChild(button);
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "✏️";
+    editBtn.style.width = "auto";
 
+    editBtn.onclick = () => {
+      const newName = prompt("Name:", ex.name);
+      const newDuration = parseInt(
+          prompt("Dauer (Sekunden):", ex.duration),
+          10
+      );
+
+      if (newName && newDuration > 0) {
+        ex.name = newName;
+        ex.duration = newDuration;
+        saveData(data);
+        renderExercises();
+      }
+    };
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "🗑️";
+    deleteBtn.style.width = "auto";
+
+    deleteBtn.onclick = () => {
+      if (confirm("Übung löschen?")) {
+        data.exercises = data.exercises.filter(e => e.id !== ex.id);
+        delete data.daily.exercisesDone[ex.id];
+        saveData(data);
+        renderExercises();
+      }
+    };
+
+    li.append(name, counter, startBtn, editBtn, deleteBtn);
     exerciseList.appendChild(li);
   });
 }
