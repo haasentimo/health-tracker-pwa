@@ -9,19 +9,37 @@ document.getElementById("today").textContent = todayStr;
 
 /* ---------- Storage ---------- */
 function loadData() {
-  const data = JSON.parse(localStorage.getItem("trackerData"));
+  const stored = JSON.parse(localStorage.getItem("trackerData"));
 
-  if (!data || data.date !== todayStr) {
-    const freshData = {
-      date: todayStr,
-      medications: [],
-      exercises: []
-    };
-    localStorage.setItem("trackerData", JSON.stringify(freshData));
-    return freshData;
+  if (!stored) {
+    return createFreshData();
   }
 
-  return data;
+  if (stored.date !== todayStr) {
+    stored.date = todayStr;
+    stored.daily = createDailyState();
+    saveData(stored);
+  }
+
+  return stored;
+}
+
+function createFreshData() {
+  const fresh = {
+    date: todayStr,
+    medications: [],
+    exercises: [],
+    daily: createDailyState()
+  };
+  saveData(fresh);
+  return fresh;
+}
+
+function createDailyState() {
+  return {
+    medicationsTaken: {},
+    exercisesDone: {}
+  };
 }
 
 function saveData(data) {
