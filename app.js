@@ -57,51 +57,21 @@ function renderMedications() {
   data.medications.forEach(med => {
     const li = document.createElement("li");
 
-    const left = document.createElement("div");
-
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = !!data.daily.medicationsTaken[med.id];
 
-    checkbox.addEventListener("change", () => {
+    checkbox.onclick = e => {
+      e.stopPropagation();
       data.daily.medicationsTaken[med.id] = checkbox.checked;
       saveData(data);
-    });
-
-    left.appendChild(checkbox);
-    left.append(" " + med.name);
-
-    const actions = document.createElement("div");
-
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "✏️";
-    editBtn.className = "secondary";
-    editBtn.style.width = "auto";
-
-    editBtn.onclick = () => {
-      const newName = prompt("Name bearbeiten:", med.name);
-      if (newName) {
-        med.name = newName;
-        saveData(data);
-        renderMedications();
-      }
     };
 
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "🗑️";
-    deleteBtn.style.width = "auto";
+    li.appendChild(checkbox);
+    li.append(" " + med.name);
 
-    deleteBtn.onclick = () => {
-      if (confirm("Medikament löschen?")) {
-        data.medications = data.medications.filter(m => m.id !== med.id);
-        delete data.daily.medicationsTaken[med.id];
-        saveData(data);
-        renderMedications();
-      }
-    };
+    li.onclick = () => openModal("medication", med);
 
-    actions.append(editBtn, deleteBtn);
-    li.append(left, actions);
     medicationList.appendChild(li);
   });
 }
@@ -150,53 +120,10 @@ function renderExercises() {
     counter.textContent =
         (data.daily.exercisesDone[ex.id] || 0) + "×";
 
-    const startBtn = document.createElement("button");
-    startBtn.textContent = "Start";
-    startBtn.className = "secondary";
-    startBtn.style.width = "auto";
+    li.append(name, counter);
 
-    startBtn.onclick = () => {
-      startTimer(ex.duration, () => {
-        data.daily.exercisesDone[ex.id] =
-            (data.daily.exercisesDone[ex.id] || 0) + 1;
-        saveData(data);
-        renderExercises();
-      });
-    };
+    li.onclick = () => openModal("exercise", ex);
 
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "✏️";
-    editBtn.style.width = "auto";
-
-    editBtn.onclick = () => {
-      const newName = prompt("Name:", ex.name);
-      const newDuration = parseInt(
-          prompt("Dauer (Sekunden):", ex.duration),
-          10
-      );
-
-      if (newName && newDuration > 0) {
-        ex.name = newName;
-        ex.duration = newDuration;
-        saveData(data);
-        renderExercises();
-      }
-    };
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "🗑️";
-    deleteBtn.style.width = "auto";
-
-    deleteBtn.onclick = () => {
-      if (confirm("Übung löschen?")) {
-        data.exercises = data.exercises.filter(e => e.id !== ex.id);
-        delete data.daily.exercisesDone[ex.id];
-        saveData(data);
-        renderExercises();
-      }
-    };
-
-    li.append(name, counter, startBtn, editBtn, deleteBtn);
     exerciseList.appendChild(li);
   });
 }
@@ -217,6 +144,80 @@ document.getElementById("add-exercise").addEventListener("click", () => {
   saveData(data);
   renderExercises();
 });
+
+const modalBackdrop = document.getElementById("modal-backdrop");
+const modalTitle = document.getElementById("modal-title");
+const editBtn = document.getElementById("edit-btn");
+const deleteBtn = document.getElementById("delete-btn");
+const closeBtn = document.getElementById("close-btn");
+
+let activeItem = null;
+let activeType = null;
+
+function openModal(type, item) {
+  activeType = type;
+  activeItem = item;
+
+  modalTitle.textContent = item.name;
+  modalBackdrop.classList.remove("hidden");
+}
+
+function closeModal() {
+  modalBackdrop.classList.add("hidden");
+  activeItem = null;
+  activeType = null;
+}
+
+closeBtn.onclick = closeModal;
+modalBackdrop.onclick = e => {
+  if (e.target === modalBackdrop) closeModal();
+};
+
+editBtn.onclick = () => {
+  if (!activeItem) return;
+
+  const newName = prompt("Name:", activeItem.name);
+  if (!newName) return;
+
+  activeItem.name = newName;
+
+  if (activeType === "exercise") {
+    const newDuration = parseInt(
+        prompt("Dauer (Sekunden):", activeItem.duration),
+        10
+    );
+    if (newDuration > 0) {
+      activeItem.duration = newDuration;
+    }
+  }
+
+  saveData(data);
+  renderMedications();
+  renderExercises();
+  closeModal();
+};
+
+deleteBtn.onclick = () => {
+  if (!activeItem) return;
+
+  if (!confirm("Wirklich löschen?")) return;
+
+  if (activeType === "medication") {
+    data.medications = data.medications.filter(m => m.id !== activeItem.id);
+    delete data.daily.medicationsTaken[activeItem.id];
+  }
+
+  if (activeType === "exercise") {
+    data.exercises = data.exercises.filter(e => e.id !== activeItem.id);
+    delete data.daily.exercisesDone[activeItem.id];
+  }
+
+  saveData(data);
+  renderMedications();
+  renderExercises();
+  closeModal();
+};
+
 
 /* ---------- Initial Render ---------- */
 renderMedications();

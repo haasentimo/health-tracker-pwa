@@ -83,3 +83,47 @@ button:active {
     border-bottom-color: #333;
   }
 }
+
+.hidden {
+  display: none;
+}
+
+#modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+#modal {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+#modal h3 {
+  margin-top: 0;
+}
+
+#modal-actions {
+  display: flex;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+#modal-actions button {
+  flex: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  #modal {
+    background: #1e1e1e;
+  }
+}
+
