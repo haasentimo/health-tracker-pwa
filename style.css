@@ -99,10 +99,53 @@ button:active {
 }
 
 #modal {
-  background: white;
+  background: black;
   padding: 20px;
   border-radius: 14px;
   width: 90%;
   max-width: 400px;
   text-align: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  #modal {
+    background: #1e1e1e;
+  }
+}
+
+#timer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+#timer-modal {
+  background: black;
+  padding: 24px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+#timer-display {
+  font-size: 48px;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+.timer-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  #timer-modal {
+    background: #1e1e1e;
+  }
 }

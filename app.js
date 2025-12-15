@@ -93,17 +93,23 @@ document.getElementById("add-medication").addEventListener("click", () => {
 /* ---------- Übungen ---------- */
 const exerciseList = document.getElementById("exercise-list");
 
-function startTimer(duration, onFinish) {
+function startTimer(duration) {
   let time = duration;
 
-  const interval = setInterval(() => {
-    if (--time <= 0) {
-      clearInterval(interval);
-      alert("Fertig 🎉");
-      onFinish();
+  timerInterval = setInterval(() => {
+    time--;
+    timerDisplay.textContent = time + "s";
+
+    if (time <= 0) {
+      clearInterval(timerInterval);
+      timerFinished = true;
+      timerDisplay.textContent = "0s";
+      timerDoneText.classList.remove("hidden");
+      timerFinishBtn.classList.remove("hidden");
     }
   }, 1000);
 }
+
 
 
 function renderExercises() {
@@ -112,15 +118,25 @@ function renderExercises() {
   data.exercises.forEach(ex => {
     const li = document.createElement("li");
 
-    const name = document.createElement("span");
-    name.textContent = `${ex.name} (${ex.duration}s)`;
+    const left = document.createElement("div");
+    left.textContent = `${ex.name} (${ex.duration}s)`;
 
     const counter = document.createElement("span");
     counter.className = "timer";
     counter.textContent =
         (data.daily.exercisesDone[ex.id] || 0) + "×";
 
-    li.append(name, counter);
+    const startBtn = document.createElement("button");
+    startBtn.textContent = "Start";
+    startBtn.className = "secondary";
+    startBtn.style.width = "auto";
+
+    startBtn.onclick = e => {
+      e.stopPropagation();
+      openTimerModal(ex);
+    };
+
+    li.append(left, counter, startBtn);
 
     li.onclick = () => openModal("exercise", ex);
 
@@ -216,6 +232,59 @@ deleteBtn.onclick = () => {
   renderExercises();
   closeModal();
 };
+
+const timerBackdrop = document.getElementById("timer-backdrop");
+const timerTitle = document.getElementById("timer-title");
+const timerDisplay = document.getElementById("timer-display");
+const timerDoneText = document.getElementById("timer-done-text");
+const timerCloseBtn = document.getElementById("timer-close-btn");
+const timerFinishBtn = document.getElementById("timer-finish-btn");
+
+let timerInterval = null;
+let timerFinished = false;
+let activeExercise = null;
+
+function openTimerModal(exercise) {
+  activeExercise = exercise;
+  timerFinished = false;
+
+  timerTitle.textContent = exercise.name;
+  timerDisplay.textContent = exercise.duration + "s";
+  timerDoneText.classList.add("hidden");
+  timerFinishBtn.classList.add("hidden");
+
+  timerBackdrop.classList.remove("hidden");
+
+  startTimer(exercise.duration);
+}
+
+function closeTimerModal(countExercise) {
+  clearInterval(timerInterval);
+  timerInterval = null;
+
+  if (countExercise && timerFinished && activeExercise) {
+    data.daily.exercisesDone[activeExercise.id] =
+        (data.daily.exercisesDone[activeExercise.id] || 0) + 1;
+    saveData(data);
+    renderExercises();
+  }
+
+  timerBackdrop.classList.add("hidden");
+  activeExercise = null;
+}
+
+timerCloseBtn.onclick = () => {
+  closeTimerModal(false);
+};
+
+timerFinishBtn.onclick = () => {
+  closeTimerModal(true);
+};
+
+timerBackdrop.onclick = () => {
+  closeTimerModal(false);
+};
+
 
 
 /* ---------- Initial Render ---------- */

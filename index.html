@@ -37,7 +37,7 @@
 
 </main>
 
-<!-- Modal -->
+<!-- Item Modal -->
 <div id="modal-backdrop" class="hidden">
     <div id="modal" onclick="event.stopPropagation()">
         <h3 id="modal-title"></h3>
@@ -50,6 +50,22 @@
         <button id="close-btn">Schließen</button>
     </div>
 </div>
+
+<!-- Timer Modal -->
+<div id="timer-backdrop" class="hidden">
+    <div id="timer-modal" onclick="event.stopPropagation()">
+        <h3 id="timer-title"></h3>
+
+        <div id="timer-display">0s</div>
+        <p id="timer-done-text" class="hidden">Gut gemacht 🎉</p>
+
+        <div class="timer-actions">
+            <button id="timer-close-btn">Abbrechen</button>
+            <button id="timer-finish-btn" class="secondary hidden">Fertig</button>
+        </div>
+    </div>
+</div>
+
 
 <script src="app.js"></script>
 </body>
