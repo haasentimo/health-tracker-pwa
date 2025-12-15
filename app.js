@@ -168,10 +168,9 @@ function closeModal() {
   activeType = null;
 }
 
-closeBtn.onclick = closeModal;
-modalBackdrop.onclick = e => {
-  if (e.target === modalBackdrop) closeModal();
-};
+closeBtn.addEventListener("click", closeModal);
+
+modalBackdrop.addEventListener("click", closeModal);
 
 editBtn.onclick = () => {
   if (!activeItem) return;
