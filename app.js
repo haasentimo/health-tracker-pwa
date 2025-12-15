@@ -57,6 +57,9 @@ function renderMedications() {
   data.medications.forEach(med => {
     const li = document.createElement("li");
 
+    const left = document.createElement("div");
+    left.className = "item-left";
+
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = !!data.daily.medicationsTaken[med.id];
@@ -67,8 +70,11 @@ function renderMedications() {
       saveData(data);
     };
 
-    li.appendChild(checkbox);
-    li.append(" " + med.name);
+    const name = document.createElement("span");
+    name.textContent = med.name;
+
+    left.append(checkbox, name);
+    li.appendChild(left);
 
     li.onclick = () => openModal("medication", med);
 

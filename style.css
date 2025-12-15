@@ -68,6 +68,12 @@ button:active {
   margin-left: 8px;
 }
 
+.item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Dark Mode */
 @media (prefers-color-scheme: dark) {
   body {
